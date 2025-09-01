@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube QA Assistant</title>
+    <link rel="stylesheet" href="{{url_for('static',filename = 'styles.css')}}">
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube QA Assistant</h1>
+        <label for="videoUrl">Enter YouTube Video URL:</label>
+        <input type="text" id="videoUrl" placeholder="E.g., https://www.youtube.com/watch?v=VIDEO_ID">
+        <label for="query">Enter Your Question:</label>
+        <input type="text" id="query" placeholder="E.g., What is the main topic of the video?">
+        <button onclick="submitQuery();">Submit</button>
+        <button onclick="summarize()"> Summarize</button>
+        <div id="response"></div>
+        <button id="copyButton" onclick="Copy()">Copy</button>
+        
+    </div>
+
+    <script>
+        function submitQuery() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            const query = document.getElementById('query').value;
+
+            fetch('/api/process_query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ video_url: videoUrl, query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = data.response;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        function summarize() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            const query = "Summarize the video";
+
+            fetch('/api/process_query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ video_url: videoUrl, query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = data.response;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        function Copy(){
+                var copyButton = document.getElementById('copyButton');
+                var responseText = document.getElementById('response');
+                // Create a textarea element to hold the text
+                var textarea = document.createElement('textarea');
+                
+                // Set the value of the textarea to the text content of the response element
+                textarea.value = responseText.textContent;
+                
+                // Append the textarea to the document body
+                document.body.appendChild(textarea);
+                
+                // Select the text inside the textarea
+                textarea.select();
+                
+                // Execute the copy command
+                document.execCommand('copy');
+                
+                // Remove the textarea from the document body
+                document.body.removeChild(textarea);
+                
+                // Provide some feedback to the user
+                alert('Text copied to clipboard!');
+            }
+    </script>
+</body>
+</html>
